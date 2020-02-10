@@ -162,6 +162,31 @@ public class Drone implements DroneInterface
 				pathBack = new ArrayList<Portal>(pathBack.subList(0, i));
 			}
 		}
+		boolean swaps = true;
+		ArrayList<Portal> path = new ArrayList<>(pathBack);
+		while (swaps) {
+			swaps = false;
+			int startGap = 0;
+			int endGap = 0;
+			for (int i = 0; i < path.size()-1; i++) {
+				 for (int j = i+1; j < path.size(); j++) {
+					 if (path.get(j).getChamber() == path.get(i).getChamber()) {
+							startGap = i;
+							endGap = j;
+							swaps = true;
+							break;
+					 }
+				 }
+				 if (swaps) {
+					 break;
+				 }
+			}
+			ArrayList<Portal> before = new ArrayList<Portal>(path.subList(0,startGap));
+			ArrayList<Portal> after = new ArrayList<Portal>(path.subList(endGap,path.size()));
+			before.addAll(after);
+			path = new ArrayList<>(before);
+		}
+		/*
 		int startGap = 0;
 		int endGap = 0;
 		for (int i = 0; i < pathBack.size()-1; i++) {
@@ -177,7 +202,9 @@ public class Drone implements DroneInterface
 		ArrayList<Portal> before = new ArrayList<Portal>(pathBack.subList(0,startGap));
 		ArrayList<Portal> after = new ArrayList<Portal>(pathBack.subList(endGap,pathBack.size()));
 		before.addAll(after);
-		return before.toArray(new Portal[before.size()]);
+		//return pathBack.toArray(new Portal[pathBack.size()]);
+		return before.toArray(new Portal[before.size()]);*/
+		return path.toArray(new Portal[path.size()]);
 	}
 
 }
