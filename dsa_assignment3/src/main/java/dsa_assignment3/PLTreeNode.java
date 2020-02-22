@@ -38,7 +38,7 @@ public final class PLTreeNode implements PLTreeNodeInterface
 	public static String getStudentID()
 	{
 		//change this return value to return your student id number
-		return "MY STUDENT ID";
+		return "1992325";
 	}
 
 	/**
@@ -49,7 +49,7 @@ public final class PLTreeNode implements PLTreeNodeInterface
 	public static String getStudentName()
 	{
 		//change this return value to return your name
-		return "MY NAME";
+		return "Palvinder Sander";
 	}
 
 	/**
