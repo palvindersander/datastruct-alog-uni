@@ -481,35 +481,35 @@ public final class PLTreeNode implements PLTreeNodeInterface
 		// WRITE YOUR CODE HERE
 		//preorder twice top left right
 		//deep copy of singleton
-		if (this.type == NodeType.OR) {
-			if (this.child1.type == NodeType.AND) {
-				PLTreeNode dCopy1 = new PLTreeNode(this.child2);
-				PLTreeNode dCopy2 = new PLTreeNode(this.child2);
-				this.type = NodeType.AND;
-				this.child1.type = NodeType.OR;
-				this.child2.type = NodeType.OR;
-				this.child2.child1 = this.child1.child2;
-				this.child2.child2 = dCopy1;
-				this.child1.child2 = dCopy2;
-				this.pushOrBelowAnd();
-				
-			} else if (this.child2.type == NodeType.AND) {
-				PLTreeNode dCopy3 = new PLTreeNode(this.child1);
-				PLTreeNode dCopy4 = new PLTreeNode(this.child1);
-				this.type = NodeType.AND;
-				this.child1.type = NodeType.OR;
-				this.child2.type = NodeType.OR;
-				this.child1.child2 = this.child2.child1;
-				this.child1.child1 = dCopy3;
-				this.child2.child1 = dCopy4;
-				this.pushOrBelowAnd();
-			}
-		}
+		
 		if (this.child1 != null) {
 			child1.pushOrBelowAnd();
 		}
 		if (this.child2 != null) {
 			child2.pushOrBelowAnd();
+		}
+		
+		if (this.type == NodeType.OR) {
+			//child1.pushOrBelowAnd();
+			//child2.pushOrBelowAnd();
+			if (this.child1.type == NodeType.AND) {
+				PLTreeNode RCopy = new PLTreeNode(this.child2);
+				PLTreeNode right = new PLTreeNode(NodeType.OR, child1.child2, child2);
+				PLTreeNode left = new PLTreeNode(NodeType.OR, child1.child1, RCopy);
+				type = NodeType.AND;
+				child1 = left;
+				child2 = right;
+				this.pushOrBelowAnd();
+				
+			} else if (this.child2.type == NodeType.AND) {
+				PLTreeNode RCopy = new PLTreeNode(this.child1);
+				PLTreeNode right = new PLTreeNode(NodeType.OR, child1, child2.child2);
+				PLTreeNode left = new PLTreeNode(NodeType.OR, RCopy, child2.child1);
+				type = NodeType.AND;
+				child1 = left;
+				child2 = right;
+				this.pushOrBelowAnd();
+			}
 		}
 	}
 
@@ -521,9 +521,6 @@ public final class PLTreeNode implements PLTreeNodeInterface
 	{
 		// WRITE YOUR CODE HERE
 		
-		if (this.type.getArity() == 1) {
-			//child1.makeAndOrRightDeep();
-		}
 		if (child1 != null) {
 			child1.makeAndOrRightDeep();
 		}
@@ -534,15 +531,14 @@ public final class PLTreeNode implements PLTreeNodeInterface
 			PLTreeNode temp = new PLTreeNode(this.child1.child2);
 			child1 = child1.child1;
 			child2 = new PLTreeNode(NodeType.AND, temp, child2);
-			//child1.makeAndOrRightDeep();
-			//child2.makeAndOrRightDeep();
 			this.makeAndOrRightDeep();
 		} else if (this.type == NodeType.OR && this.child1.type == NodeType.OR) {
 			PLTreeNode temp = new PLTreeNode(this.child1.child2);
 			child1 = child1.child1;
 			child2 = new PLTreeNode(NodeType.OR, temp, child2);
-			//child1.makeAndOrRightDeep();
-			//child2.makeAndOrRightDeep();
+			if (child1.type == child2.child1.type) {
+				child2 = child2.child2;
+			}
 			this.makeAndOrRightDeep();
 		}
 	}
