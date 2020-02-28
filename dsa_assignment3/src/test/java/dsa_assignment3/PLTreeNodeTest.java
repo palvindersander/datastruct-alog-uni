@@ -55,7 +55,7 @@ public class PLTreeNodeTest
 	@Test
 	public void testPLTree()
 	{
-		NodeType[] typeList = { NodeType.R, NodeType.P, NodeType.OR, NodeType.TRUE, NodeType.Q, NodeType.NOT, NodeType.AND,
+		NodeType[] typeList = { NodeType.R, NodeType.P, NodeType.OR, NodeType.TRUE, NodeType.Q, NodeType.NOT, NodeType.NOT, NodeType.NOT, NodeType.NOT, NodeType.NOT, NodeType.AND,
 				NodeType.IMPLIES };
 		logger.debug("typeList: " + Arrays.toString(typeList));
 

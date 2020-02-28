@@ -346,10 +346,10 @@ public final class PLTreeNode implements PLTreeNodeInterface
 		if (this.type == NodeType.NOT) {
 			if(this.child1.type == NodeType.TRUE) {
 				this.child1 = null;
-				this.type = NodeType.TRUE;
+				this.type = NodeType.FALSE;
 			} else if(this.child1.type == NodeType.FALSE) {
 				this.child1 = null;
-				this.type = NodeType.FALSE;
+				this.type = NodeType.TRUE;
 			}
 		}
 		if (this.type == NodeType.OR) {
@@ -436,14 +436,12 @@ public final class PLTreeNode implements PLTreeNodeInterface
 	public void pushNotDown()
 	{
 		// WRITE YOUR CODE HERE
-		if (this.child1 != null && this.type == NodeType.NOT) {
+		if (this.type == NodeType.NOT) {
 			if(this.child1.type == NodeType.NOT) {
 				//change this to 2nd child
-				if(this.child1.child1 != null) {
 					this.type = this.child1.child1.type;
-					this.child1 = this.child1.child1;
-					this.child2 = this.child1.child2;
-				}
+					this.child2 = this.child1.child1.child2;
+					this.child1 = this.child1.child1.child1;
 			} else if (this.child1.type == NodeType.AND) {
 				//change to or not not
 				if (this.child1.child1 != null && this.child1.child2 != null) {
