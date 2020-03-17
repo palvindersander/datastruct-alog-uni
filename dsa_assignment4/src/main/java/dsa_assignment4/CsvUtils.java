@@ -208,35 +208,52 @@ public class CsvUtils
 	 *             requirements or have different CSV formats
 	 */
 	public static boolean mergePairCsv(Path file1Path, Path file2Path, String columnName, Path outputPath)
-		throws Exception
-	{
+		    throws Exception {
 		// WRITE YOUR CODE HERE AND REPLACE THE RETURN STATEMENT
-		try (Scanner from1 = new Scanner(file1Path); Scanner from2 = new Scanner(file2Path))
-		{
-			CsvFormatter formatter1 = new CsvFormatter(from1);
-			CsvFormatter formatter2 = new CsvFormatter(from2);
-			if(! Arrays.equals(formatter1.getHeaderStrings(), formatter2.getHeaderStrings())) {
-				return true;
+		try (Scanner from1 = new Scanner(file1Path);
+			Scanner from2 = new Scanner(file2Path);
+			PrintWriter to = new PrintWriter(outputPath.toFile());) {
+			String row1[];
+		    String row2[];
+		    CsvFormatter formatter1 = new CsvFormatter(from1);
+		    CsvFormatter formatter2 = new CsvFormatter(from2);
+		    CsvFormatter.RowComparator comparator = formatter1.new RowComparator(columnName);
+		    formatter1.writeHeader(to);
+		    row1 = formatter1.readRow(from1);
+		    row2 = formatter2.readRow(from2);
+		    Boolean db = false;
+		    while (!db) {
+			if (row1 == null) {
+			    while (row2 != null) {
+			    	formatter2.writeRow(to, row2);
+			    	row2 = formatter2.readRow(from2);
+			    }
+			    db = true;
 			}
-			CsvFormatter.RowComparator comparator = formatter1.new RowComparator(columnName);
-			PriorityQueue<String[]> pq = new PriorityQueue<>(comparator);
-			String[] row;
-			while ((row = formatter1.readRow(from1)) != null) {
-				pq.add(row);
+			if (row2 == null) {
+			    while (row1 != null) {
+			    	formatter1.writeRow(to, row1);
+			    	row1 = formatter1.readRow(from1);
+			    }
+			    db = true;
 			}
-			while ((row = formatter2.readRow(from2)) != null) {
-				pq.add(row);
+			if (row1 != null && row2 != null) {
+			    int compVal = comparator.compare(row1, row2);
+			    if (compVal > 0) {
+			    	formatter2.writeRow(to, row2);
+			    	row2 = formatter2.readRow(from2);
+			    } else if (compVal < 0) {
+			    	formatter1.writeRow(to, row1);
+			    	row1 = formatter1.readRow(from1);
+			    } else {
+			    	formatter1.writeRow(to, row1);
+			    	row1 = formatter1.readRow(from1);
+			    }
 			}
-			try (PrintWriter to = new PrintWriter(outputPath.toFile()))
-			{
-				formatter1.writeHeader(to);
-				while(pq.isEmpty() == false) {
-					formatter1.writeRow(to, pq.poll());
-				}
-			}
+		    }
 		}
 		return true;
-	}
+	    }
 
 	/**
 	 * Merge a list of ordered input CSV files into a single ordered output CSV
@@ -269,24 +286,19 @@ public class CsvUtils
 	 *             files, or if the input files do not match the simplified CSV
 	 *             requirements or have different CSV formats
 	 */
-	public static boolean mergeListCsv(Path[] pathList, String columnName, Path outputPath)
-		throws Exception
-	{
+	public static boolean mergeListCsv(Path[] pathList, String columnName, Path outputPath) throws Exception {
 		Deque<Path> paths = new LinkedList<>(Arrays.asList(pathList));
-		// WRITE YOUR CODE HERE AND REPLACE THE RETURN STATEMENT
-		int pathNumber = 0;
-		while (paths.isEmpty() == false) {
-			if(pathNumber == 0) {
-				Path p1 = paths.remove();
-				Path p2 = paths.remove();
-				mergePairCsv(p1, p2, columnName, outputPath);
-				pathNumber += 1;
-			}
-			Path p = paths.remove();
-			mergePairCsv(p, outputPath, columnName, outputPath);
+		int tNum = 0;
+		while (paths.size() > 2) {
+		    Path tPath = outputPath.resolveSibling(String.format("temp_%05d_%s", tNum, outputPath.getFileName()));
+		    mergePairCsv(paths.poll(), paths.poll(), columnName, tPath);
+		    paths.add(tPath);
+		    tNum = tNum + 1;
 		}
-
+		if (paths.size() == 2) {
+		    mergePairCsv(paths.poll(), paths.poll(), columnName, outputPath);
+		    paths.addFirst(outputPath);
+		}
 		return true;
-
 	}
 }
